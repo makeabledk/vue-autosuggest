@@ -202,6 +202,7 @@ export default {
       default: "autosuggest"
     }
   },
+  emits: ['item-changed', 'update:modelValue', 'selected', 'opened', 'closed'],
   data() {
     return {
       internalValue: null,
@@ -422,6 +423,12 @@ export default {
           let trueIndex = index - this.computedSections[i].start_index;
           const sectionName = this.computedSections[i].name
           let childSection = this.$refs[this.getSectionRef(`${sectionName}${i}`)];
+
+          // Fix refs being an array because it is set within a v-for
+          if (Array.isArray(childSection)) {
+              childSection = childSection[0] ?? null
+          }
+
           if (childSection) {
             obj = this.normalizeItem(
               this.computedSections[i].name,
@@ -509,7 +516,7 @@ export default {
             this.loading = true;
             this.currentIndex = null;
             this.internalValue = this.searchInputOriginal;
-            this.$emit('input', this.searchInputOriginal);
+            this.$emit('update:modelValue', this.searchInputOriginal);
             e.preventDefault();
             break;
         }
